@@ -1,0 +1,16 @@
+{
+  "name": "n8n-custom-nodes",
+  "version": "1.0.0",
+  "description": "Custom community nodes for n8n",
+  "private": true,
+  "scripts": {
+    "install-nodes": "npm install"
+  },
+  "dependencies": {
+    "n8n-nodes-document-generator": "^0.7.0",
+    "n8n-nodes-chatwoot": "^0.1.0",
+    "n8n-nodes-imap": "^0.1.0",
+    "n8n-nodes-puppeteer": "^0.5.0",
+    "n8n-nodes-mcp": "^0.1.14"
+  }
+}

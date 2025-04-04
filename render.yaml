@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: n8n
+    env: node
+    plan: free
+    buildCommand: ./custom-build.sh
+    startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE
+        value: true
+      - key: N8N_REINSTALL_MISSING_PACKAGES
+        value: true
+      - key: N8N_COMMUNITY_NODES_ENABLED
+        value: true
+      - key: GENERIC_TIMEZONE
+        value: UTC
