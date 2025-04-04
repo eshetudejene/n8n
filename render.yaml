@@ -17,5 +17,15 @@ services:
         value: true
       - key: N8N_COMMUNITY_NODES_ENABLED
         value: true
+      - key: N8N_USER_FOLDER
+        value: "/opt/render/.n8n"
+      - key: N8N_CUSTOM_EXTENSIONS
+        value: "/opt/render/.n8n/nodes"
+      - key: N8N_LOG_LEVEL
+        value: "debug"
       - key: GENERIC_TIMEZONE
         value: UTC
+    disk:
+      name: n8n-data
+      mountPath: /opt/render/.n8n
+      sizeGB: 1

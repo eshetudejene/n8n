@@ -24,4 +24,28 @@ npm install
 node install-nodes.js
 cd ..
 
+# Create .n8n directory if it doesn't exist
+echo "Setting up .n8n directory..."
+mkdir -p /opt/render/.n8n
+mkdir -p /opt/render/.n8n/nodes
+
+# Create n8n.json config file to enable community nodes
+echo "Creating n8n configuration..."
+cat > /opt/render/.n8n/n8n.json << EOL
+{
+  "nodes": {
+    "include": [
+      "n8n-nodes-document-generator",
+      "n8n-nodes-chatwoot",
+      "n8n-nodes-imap",
+      "n8n-nodes-puppeteer",
+      "n8n-nodes-mcp"
+    ]
+  }
+}
+EOL
+
+# Set proper permissions
+chmod -R 755 /opt/render/.n8n
+
 echo "Build completed successfully!"
