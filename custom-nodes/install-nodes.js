@@ -72,20 +72,20 @@ communityNodes.forEach(nodeName => {
     try {
       const n8nDir = path.resolve(process.env.HOME || '/root', '.n8n');
       const n8nNodesDir = path.join(n8nDir, 'nodes');
-      
+
       if (!fs.existsSync(n8nNodesDir)) {
         fs.mkdirSync(n8nNodesDir, { recursive: true });
       }
-      
+
       const nodeN8nDestDir = path.join(n8nNodesDir, nodeName);
       if (!fs.existsSync(nodeN8nDestDir)) {
         fs.mkdirSync(nodeN8nDestDir, { recursive: true });
       }
-      
+
       execSync(`cp -r ${nodeSourceDir}/* ${nodeN8nDestDir}/`, {
         stdio: 'inherit'
       });
-      
+
       console.log(`Also installed ${nodeName} to .n8n/nodes directory`);
     } catch (err) {
       console.log(`Note: Could not copy to .n8n directory: ${err.message}`);
