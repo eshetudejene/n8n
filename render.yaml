@@ -9,6 +9,8 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      - key: NODE_OPTIONS
+        value: "--max-old-space-size=2048"
       - key: N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE
         value: true
       - key: N8N_REINSTALL_MISSING_PACKAGES
