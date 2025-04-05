@@ -6,12 +6,16 @@ USER root
 RUN mkdir -p /home/node/.n8n/nodes
 RUN mkdir -p /opt/render/project/src/custom-extensions
 
-# For Puppeteer, install Chrome dependencies
-RUN apt-get update && apt-get install -y \
+# For Puppeteer, install Chrome dependencies (using apk for Alpine Linux)
+RUN apk update && apk add --no-cache \
     chromium \
-    fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf \
-    --no-install-recommends \
-    && rm -rf /var/lib/apt/lists/*
+    nss \
+    freetype \
+    freetype-dev \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont \
+    && rm -rf /var/cache/apk/*
 
 # Copy custom startup script
 COPY custom-startup.sh /home/node/custom-startup.sh
