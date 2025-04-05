@@ -19,7 +19,7 @@ services:
       - key: N8N_USER_FOLDER
         value: "/home/node/.n8n"
       - key: N8N_CUSTOM_EXTENSIONS
-        value: "/home/node/.n8n/nodes"
+        value: "/opt/render/project/src/custom-extensions"
       - key: N8N_LOG_LEVEL
         value: "debug"
       - key: GENERIC_TIMEZONE
