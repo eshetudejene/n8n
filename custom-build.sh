@@ -17,17 +17,21 @@ echo "Building packages with memory optimization..."
 pnpm run build:backend --concurrency=1
 pnpm run build:frontend
 
-# Install custom community nodes
-echo "Installing custom community nodes..."
-cd custom-nodes
-npm install
-node install-nodes.js
-cd ..
-
-# Create .n8n directory if it doesn't exist
+# Create .n8n directory structure
 echo "Setting up .n8n directory..."
 mkdir -p /opt/render/.n8n
 mkdir -p /opt/render/.n8n/nodes
+
+# Install custom community nodes directly to the .n8n directory
+echo "Installing custom community nodes..."
+cd custom-nodes
+
+# Install each community node directly to the .n8n/nodes directory
+npm_config_prefix=/opt/render/.n8n npm install n8n-nodes-document-generator@1.0.10
+npm_config_prefix=/opt/render/.n8n npm install n8n-nodes-chatwoot@0.1.40
+npm_config_prefix=/opt/render/.n8n npm install n8n-nodes-imap@2.5.0
+npm_config_prefix=/opt/render/.n8n npm install n8n-nodes-puppeteer@1.4.1
+npm_config_prefix=/opt/render/.n8n npm install n8n-nodes-mcp@0.1.14
 
 # Create n8n.json config file to enable community nodes
 echo "Creating n8n configuration..."
@@ -47,5 +51,8 @@ EOL
 
 # Set proper permissions
 chmod -R 755 /opt/render/.n8n
+
+# Create a symbolic link to ensure n8n can find the nodes
+ln -sf /opt/render/.n8n/nodes /opt/render/project/src/node_modules
 
 echo "Build completed successfully!"

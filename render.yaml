@@ -12,11 +12,11 @@ services:
       - key: NODE_OPTIONS
         value: "--max-old-space-size=2048"
       - key: N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE
-        value: true
+        value: "true"
       - key: N8N_REINSTALL_MISSING_PACKAGES
-        value: true
+        value: "true"
       - key: N8N_COMMUNITY_NODES_ENABLED
-        value: true
+        value: "true"
       - key: N8N_USER_FOLDER
         value: "/opt/render/.n8n"
       - key: N8N_CUSTOM_EXTENSIONS
@@ -25,6 +25,31 @@ services:
         value: "debug"
       - key: GENERIC_TIMEZONE
         value: UTC
+      # Make sure these are properly set for your Supabase connection
+      - key: DB_TYPE
+        value: postgresdb
+      - key: DB_POSTGRESDB_HOST
+        fromDatabase:
+          name: your-supabase-db
+          property: host
+      - key: DB_POSTGRESDB_PORT
+        fromDatabase:
+          name: your-supabase-db
+          property: port
+      - key: DB_POSTGRESDB_DATABASE
+        fromDatabase:
+          name: your-supabase-db
+          property: database
+      - key: DB_POSTGRESDB_USER
+        fromDatabase:
+          name: your-supabase-db
+          property: user
+      - key: DB_POSTGRESDB_PASSWORD
+        fromDatabase:
+          name: your-supabase-db
+          property: password
+      - key: DB_POSTGRESDB_SCHEMA
+        value: public
     disk:
       name: n8n-data
       mountPath: /opt/render/.n8n
