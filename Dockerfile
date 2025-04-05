@@ -70,6 +70,16 @@ ENV N8N_COMMUNITY_NODES_ENABLED=true
 ENV N8N_USER_FOLDER=/home/node/.n8n
 ENV N8N_CUSTOM_EXTENSIONS=/opt/render/project/src/custom-extensions
 ENV N8N_LOG_LEVEL=debug
+ENV PORT=5678
 
-# Use the default n8n entrypoint
-CMD ["n8n", "start"]
+# Expose the port
+EXPOSE 5678
+
+# Create a simple startup script
+USER root
+RUN echo '#!/bin/sh\ncd /usr/local/lib/node_modules/n8n\nnode bin/n8n start' > /usr/local/bin/start-n8n
+RUN chmod +x /usr/local/bin/start-n8n
+USER node
+
+# Use the startup script
+CMD ["/usr/local/bin/start-n8n"]
