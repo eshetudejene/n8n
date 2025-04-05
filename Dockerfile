@@ -75,11 +75,5 @@ ENV PORT=5678
 # Expose the port
 EXPOSE 5678
 
-# Create a simple startup script
-USER root
-RUN echo '#!/bin/sh\ncd /usr/local/lib/node_modules/n8n\nnode bin/n8n start' > /usr/local/bin/start-n8n
-RUN chmod +x /usr/local/bin/start-n8n
-USER node
-
-# Use the startup script
-CMD ["/usr/local/bin/start-n8n"]
+# Use the default entrypoint and command from the base image
+# This is important - we're not overriding the ENTRYPOINT or CMD
