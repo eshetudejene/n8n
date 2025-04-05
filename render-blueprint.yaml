@@ -1,0 +1,48 @@
+services:
+  - type: web
+    name: n8n
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_OPTIONS
+        value: "--max-old-space-size=2048"
+      - key: N8N_COMMUNITY_PACKAGES_ALLOW_TOOL_USAGE
+        value: "true"
+      - key: N8N_REINSTALL_MISSING_PACKAGES
+        value: "true"
+      - key: N8N_COMMUNITY_NODES_ENABLED
+        value: "true"
+      - key: N8N_USER_FOLDER
+        value: "/home/node/.n8n"
+      - key: N8N_CUSTOM_EXTENSIONS
+        value: "/opt/render/project/src/custom-extensions"
+      - key: N8N_LOG_LEVEL
+        value: "debug"
+      - key: GENERIC_TIMEZONE
+        value: UTC
+      # Supabase database configuration
+      - key: DB_TYPE
+        value: postgresdb
+      - key: DB_POSTGRESDB_HOST
+        sync: false # You'll set this in the Render dashboard
+      - key: DB_POSTGRESDB_PORT
+        value: "5432" # Default PostgreSQL port
+      - key: DB_POSTGRESDB_DATABASE
+        value: "postgres" # Default database name
+      - key: DB_POSTGRESDB_USER
+        value: "postgres" # Default Supabase user
+      - key: DB_POSTGRESDB_PASSWORD
+        sync: false # You'll set this in the Render dashboard
+      - key: DB_POSTGRESDB_SCHEMA
+        value: public
+      # Encryption key for secure data
+      - key: N8N_ENCRYPTION_KEY
+        generateValue: true
+    disk:
+      name: n8n-data
+      mountPath: /home/node/.n8n
+      sizeGB: 1
