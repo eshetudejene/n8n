@@ -4,10 +4,10 @@ set -e
 echo "Starting custom n8n startup script..."
 
 # Create necessary directories
-mkdir -p /home/node/.n8n/nodes
+mkdir -p /opt/render/project/src/custom-extensions
 
 # Check if nodes are already installed
-if [ ! -d "/home/node/.n8n/nodes/n8n-nodes-document-generator" ]; then
+if [ ! -d "/opt/render/project/src/custom-extensions/n8n-nodes-document-generator" ]; then
   echo "Installing community nodes..."
 
   # Create a temporary directory for installing nodes
@@ -16,14 +16,37 @@ if [ ! -d "/home/node/.n8n/nodes/n8n-nodes-document-generator" ]; then
 
   # Initialize npm and install nodes
   npm init -y
-  npm install n8n-nodes-document-generator@1.0.10 \
-    n8n-nodes-chatwoot@0.1.40 \
-    n8n-nodes-imap@2.5.0 \
-    n8n-nodes-puppeteer@1.4.1 \
-    n8n-nodes-mcp@0.1.14
 
-  # Copy the installed nodes to the n8n nodes directory
-  cp -r node_modules/* /home/node/.n8n/nodes/
+  # Install each node in its own directory
+  echo "Installing n8n-nodes-document-generator..."
+  mkdir -p /opt/render/project/src/custom-extensions/n8n-nodes-document-generator
+  cd /opt/render/project/src/custom-extensions/n8n-nodes-document-generator
+  npm init -y
+  npm install n8n-nodes-document-generator@1.0.10
+
+  echo "Installing n8n-nodes-chatwoot..."
+  mkdir -p /opt/render/project/src/custom-extensions/n8n-nodes-chatwoot
+  cd /opt/render/project/src/custom-extensions/n8n-nodes-chatwoot
+  npm init -y
+  npm install n8n-nodes-chatwoot@0.1.40
+
+  echo "Installing n8n-nodes-imap..."
+  mkdir -p /opt/render/project/src/custom-extensions/n8n-nodes-imap
+  cd /opt/render/project/src/custom-extensions/n8n-nodes-imap
+  npm init -y
+  npm install n8n-nodes-imap@2.5.0
+
+  echo "Installing n8n-nodes-puppeteer..."
+  mkdir -p /opt/render/project/src/custom-extensions/n8n-nodes-puppeteer
+  cd /opt/render/project/src/custom-extensions/n8n-nodes-puppeteer
+  npm init -y
+  npm install n8n-nodes-puppeteer@1.4.1
+
+  echo "Installing n8n-nodes-mcp..."
+  mkdir -p /opt/render/project/src/custom-extensions/n8n-nodes-mcp
+  cd /opt/render/project/src/custom-extensions/n8n-nodes-mcp
+  npm init -y
+  npm install n8n-nodes-mcp@0.1.14
 
   # Clean up
   cd /
@@ -52,9 +75,9 @@ fi
 
 # Debug information
 echo "==== DEBUG: INSTALLED NODES ===="
-ls -la /home/node/.n8n/nodes
+ls -la /opt/render/project/src/custom-extensions
 echo "==== DEBUG: NODE MODULES ===="
-find /home/node/.n8n/nodes -type d -maxdepth 2 | sort
+find /opt/render/project/src/custom-extensions -type d -maxdepth 2 | sort
 echo "==== DEBUG: N8N CONFIG ===="
 cat /home/node/.n8n/n8n.json
 echo "==== DEBUG: ENVIRONMENT VARIABLES ===="
