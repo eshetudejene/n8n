@@ -17,10 +17,76 @@ RUN apk update && apk add --no-cache \
     ttf-freefont \
     && rm -rf /var/cache/apk/*
 
-# Copy custom startup script
-COPY custom-startup.sh /home/node/custom-startup.sh
-RUN chmod +x /home/node/custom-startup.sh
-RUN chown node:node /home/node/custom-startup.sh
+# Create a simple startup script directly in the Dockerfile
+RUN echo '#!/bin/bash\n\
+echo "Starting n8n with community nodes..."\n\
+\n\
+# Create necessary directories\n\
+mkdir -p /opt/render/project/src/custom-extensions\n\
+\n\
+# Install community nodes\n\
+echo "Installing community nodes..."\n\
+mkdir -p /tmp/n8n-nodes\n\
+cd /tmp/n8n-nodes\n\
+\n\
+# Initialize npm and install nodes\n\
+npm init -y\n\
+\n\
+# Install each node in its own directory\n\
+echo "Installing n8n-nodes-document-generator..."\n\
+mkdir -p /opt/render/project/src/custom-extensions/n8n-nodes-document-generator\n\
+cd /opt/render/project/src/custom-extensions/n8n-nodes-document-generator\n\
+npm init -y\n\
+npm install n8n-nodes-document-generator@1.0.10\n\
+\n\
+echo "Installing n8n-nodes-chatwoot..."\n\
+mkdir -p /opt/render/project/src/custom-extensions/n8n-nodes-chatwoot\n\
+cd /opt/render/project/src/custom-extensions/n8n-nodes-chatwoot\n\
+npm init -y\n\
+npm install n8n-nodes-chatwoot@0.1.40\n\
+\n\
+echo "Installing n8n-nodes-imap..."\n\
+mkdir -p /opt/render/project/src/custom-extensions/n8n-nodes-imap\n\
+cd /opt/render/project/src/custom-extensions/n8n-nodes-imap\n\
+npm init -y\n\
+npm install n8n-nodes-imap@2.5.0\n\
+\n\
+echo "Installing n8n-nodes-puppeteer..."\n\
+mkdir -p /opt/render/project/src/custom-extensions/n8n-nodes-puppeteer\n\
+cd /opt/render/project/src/custom-extensions/n8n-nodes-puppeteer\n\
+npm init -y\n\
+npm install n8n-nodes-puppeteer@1.4.1\n\
+\n\
+echo "Installing n8n-nodes-mcp..."\n\
+mkdir -p /opt/render/project/src/custom-extensions/n8n-nodes-mcp\n\
+cd /opt/render/project/src/custom-extensions/n8n-nodes-mcp\n\
+npm init -y\n\
+npm install n8n-nodes-mcp@0.1.14\n\
+\n\
+# Create n8n.json configuration\n\
+echo "Creating n8n.json configuration..."\n\
+cat > /home/node/.n8n/n8n.json << EOL\n\
+{\n\
+  "nodes": {\n\
+    "include": [\n\
+      "n8n-nodes-document-generator",\n\
+      "n8n-nodes-chatwoot",\n\
+      "n8n-nodes-imap",\n\
+      "n8n-nodes-puppeteer",\n\
+      "n8n-nodes-mcp"\n\
+    ]\n\
+  }\n\
+}\n\
+EOL\n\
+\n\
+# Start n8n\n\
+echo "Starting n8n..."\n\
+exec n8n start\n\
+' > /home/node/startup.sh
+
+# Make the script executable
+RUN chmod +x /home/node/startup.sh
+RUN chown node:node /home/node/startup.sh
 
 # Set permissions
 RUN chown -R node:node /home/node/.n8n
@@ -37,5 +103,5 @@ ENV N8N_USER_FOLDER=/home/node/.n8n
 ENV N8N_CUSTOM_EXTENSIONS=/opt/render/project/src/custom-extensions
 ENV N8N_LOG_LEVEL=debug
 
-# Use custom startup script
-ENTRYPOINT ["/home/node/custom-startup.sh"]
+# Use the embedded startup script
+ENTRYPOINT ["/home/node/startup.sh"]
