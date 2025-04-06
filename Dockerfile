@@ -51,6 +51,9 @@ WORKDIR /opt/render/project/src/custom-extensions/n8n-nodes-mcp
 RUN npm init -y
 RUN npm install n8n-nodes-mcp@0.1.14
 
+# Install Firecrawl MCP server globally
+RUN npm install -g @modelcontextprotocol/server-firecrawl
+
 # Create n8n.json configuration
 WORKDIR /home/node/.n8n
 RUN echo '{"nodes":{"include":["n8n-nodes-document-generator","n8n-nodes-chatwoot","n8n-nodes-imap","n8n-nodes-puppeteer","n8n-nodes-mcp"]}}' > n8n.json
