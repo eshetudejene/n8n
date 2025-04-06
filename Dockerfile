@@ -63,6 +63,9 @@ RUN echo '{"nodes":{"include":["n8n-nodes-document-generator","n8n-nodes-chatwoo
 RUN chown -R node:node /home/node/.n8n
 RUN chown -R node:node /opt/render/project/src/custom-extensions
 RUN chown -R node:node /home/node/.cache
+# Set proper permissions for n8n config directory
+RUN mkdir -p /home/node/.n8n/.n8n
+RUN chmod 700 /home/node/.n8n/.n8n
 
 # Switch back to node user
 USER node
@@ -80,6 +83,8 @@ ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 # Puppeteer browser launch arguments for better performance in containerized environments
 ENV PUPPETEER_ARGS="--no-sandbox,--disable-setuid-sandbox,--disable-dev-shm-usage,--disable-accelerated-2d-canvas,--no-first-run,--no-zygote,--disable-gpu,--disable-extensions,--disable-audio-output"
+# Enforce proper file permissions for n8n settings
+ENV N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
 
 # Expose the port
 EXPOSE 5678
