@@ -6,6 +6,7 @@ USER root
 RUN mkdir -p /home/node/.n8n/nodes
 RUN mkdir -p /opt/render/project/src/custom-extensions
 RUN mkdir -p /home/node/.cache/puppeteer
+RUN mkdir -p /home/node/.n8n/.n8n
 
 # For Puppeteer, install Chrome dependencies (using apk for Alpine Linux)
 RUN apk update && apk add --no-cache \
@@ -59,13 +60,16 @@ RUN npm install n8n-nodes-mcp@0.1.14
 WORKDIR /home/node/.n8n
 RUN echo '{"nodes":{"include":["n8n-nodes-document-generator","n8n-nodes-chatwoot","n8n-nodes-imap","n8n-nodes-puppeteer","n8n-nodes-mcp"]}}' > n8n.json
 
-# Set permissions
-RUN chown -R node:node /home/node/.n8n
-RUN chown -R node:node /opt/render/project/src/custom-extensions
-RUN chown -R node:node /home/node/.cache
-# Set proper permissions for n8n config directory
-RUN mkdir -p /home/node/.n8n/.n8n
+# Set permissions - CRITICAL: ensure node user has full access to all required directories
+RUN chown -R node:node /home/node
+RUN chmod -R 755 /home/node
 RUN chmod 700 /home/node/.n8n/.n8n
+RUN chown -R node:node /opt/render/project/src/custom-extensions
+
+# Create an empty config file with correct permissions
+RUN touch /home/node/.n8n/.n8n/config
+RUN chown node:node /home/node/.n8n/.n8n/config
+RUN chmod 600 /home/node/.n8n/.n8n/config
 
 # Switch back to node user
 USER node
