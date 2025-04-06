@@ -66,11 +66,8 @@ RUN chmod -R 755 /home/node
 RUN chmod 700 /home/node/.n8n/.n8n
 RUN chown -R node:node /opt/render/project/src/custom-extensions
 
-# Create a valid empty JSON config file with correct permissions
-# Using a fixed encryption key that will match the environment variable
-RUN echo '{"encryptionKey": "n8n-render-instance-key-12345"}' > /home/node/.n8n/.n8n/config
-RUN chown node:node /home/node/.n8n/.n8n/config
-RUN chmod 600 /home/node/.n8n/.n8n/config
+# We'll let n8n create its own config file with the correct encryption key
+# from the environment variable
 
 # Switch back to node user
 USER node
@@ -90,11 +87,10 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_ARGS="--no-sandbox,--disable-setuid-sandbox,--disable-dev-shm-usage,--disable-accelerated-2d-canvas,--no-first-run,--no-zygote,--disable-gpu,--disable-extensions,--disable-audio-output"
 # Enforce proper file permissions for n8n settings
 ENV N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
-# Set the encryption key to match the one in the config file
-ENV N8N_ENCRYPTION_KEY=n8n-render-instance-key-12345
+# Note: N8N_ENCRYPTION_KEY should be set in Render environment variables, not here
 
 # Expose the port
 EXPOSE 5678
 
-# Use the default entrypoint and command from the base image
-# This is important - we're not overriding the ENTRYPOINT or CMD
+# Override the default entrypoint to run n8n start directly
+ENTRYPOINT ["node", "/usr/local/lib/node_modules/n8n/bin/n8n", "start"]
