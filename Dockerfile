@@ -66,8 +66,8 @@ RUN chmod -R 755 /home/node
 RUN chmod 700 /home/node/.n8n/.n8n
 RUN chown -R node:node /opt/render/project/src/custom-extensions
 
-# Create an empty config file with correct permissions
-RUN touch /home/node/.n8n/.n8n/config
+# Create a valid empty JSON config file with correct permissions
+RUN echo '{}' > /home/node/.n8n/.n8n/config
 RUN chown node:node /home/node/.n8n/.n8n/config
 RUN chmod 600 /home/node/.n8n/.n8n/config
 
