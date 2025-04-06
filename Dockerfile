@@ -67,7 +67,8 @@ RUN chmod 700 /home/node/.n8n/.n8n
 RUN chown -R node:node /opt/render/project/src/custom-extensions
 
 # Create a valid empty JSON config file with correct permissions
-RUN echo '{}' > /home/node/.n8n/.n8n/config
+# Using a fixed encryption key that will match the environment variable
+RUN echo '{"encryptionKey": "n8n-render-instance-key-12345"}' > /home/node/.n8n/.n8n/config
 RUN chown node:node /home/node/.n8n/.n8n/config
 RUN chmod 600 /home/node/.n8n/.n8n/config
 
@@ -89,6 +90,8 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_ARGS="--no-sandbox,--disable-setuid-sandbox,--disable-dev-shm-usage,--disable-accelerated-2d-canvas,--no-first-run,--no-zygote,--disable-gpu,--disable-extensions,--disable-audio-output"
 # Enforce proper file permissions for n8n settings
 ENV N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+# Set the encryption key to match the one in the config file
+ENV N8N_ENCRYPTION_KEY=n8n-render-instance-key-12345
 
 # Expose the port
 EXPOSE 5678
