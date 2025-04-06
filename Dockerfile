@@ -78,6 +78,8 @@ ENV N8N_LOG_LEVEL=debug
 ENV PORT=5678
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+# Puppeteer browser launch arguments for better performance in containerized environments
+ENV PUPPETEER_ARGS="--no-sandbox,--disable-setuid-sandbox,--disable-dev-shm-usage,--disable-accelerated-2d-canvas,--no-first-run,--no-zygote,--disable-gpu,--disable-extensions,--disable-audio-output"
 
 # Expose the port
 EXPOSE 5678
