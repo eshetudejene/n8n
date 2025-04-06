@@ -5,6 +5,7 @@ USER root
 # Create necessary directories
 RUN mkdir -p /home/node/.n8n/nodes
 RUN mkdir -p /opt/render/project/src/custom-extensions
+RUN mkdir -p /home/node/.cache/puppeteer
 
 # For Puppeteer, install Chrome dependencies (using apk for Alpine Linux)
 RUN apk update && apk add --no-cache \
@@ -44,6 +45,9 @@ RUN mkdir -p /opt/render/project/src/custom-extensions/n8n-nodes-puppeteer
 WORKDIR /opt/render/project/src/custom-extensions/n8n-nodes-puppeteer
 RUN npm init -y
 RUN npm install n8n-nodes-puppeteer@1.4.1
+# Install Puppeteer browser
+RUN cd /opt/render/project/src/custom-extensions/n8n-nodes-puppeteer && \
+    npx puppeteer browsers install chrome
 
 # Install n8n-nodes-mcp
 RUN mkdir -p /opt/render/project/src/custom-extensions/n8n-nodes-mcp
@@ -58,6 +62,7 @@ RUN echo '{"nodes":{"include":["n8n-nodes-document-generator","n8n-nodes-chatwoo
 # Set permissions
 RUN chown -R node:node /home/node/.n8n
 RUN chown -R node:node /opt/render/project/src/custom-extensions
+RUN chown -R node:node /home/node/.cache
 
 # Switch back to node user
 USER node
@@ -71,6 +76,8 @@ ENV N8N_USER_FOLDER=/home/node/.n8n
 ENV N8N_CUSTOM_EXTENSIONS=/opt/render/project/src/custom-extensions
 ENV N8N_LOG_LEVEL=debug
 ENV PORT=5678
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 # Expose the port
 EXPOSE 5678
