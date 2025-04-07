@@ -92,5 +92,5 @@ ENV N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
 # Expose the port
 EXPOSE 5678
 
-# Override the default entrypoint to run n8n start directly
-ENTRYPOINT ["node", "/usr/local/lib/node_modules/n8n/bin/n8n", "start"]
+# Override the default entrypoint to run n8n start with increased memory limit
+ENTRYPOINT ["node", "--max-old-space-size=4096", "/usr/local/lib/node_modules/n8n/bin/n8n", "start"]
