@@ -17,6 +17,7 @@ RUN apk update && apk add --no-cache \
     harfbuzz \
     ca-certificates \
     ttf-freefont \
+    netcat-openbsd \
     && rm -rf /var/cache/apk/*
 
 # Install community nodes during build
@@ -54,11 +55,18 @@ RUN cd /opt/render/project/src/custom-extensions/n8n-nodes-puppeteer && \
 WORKDIR /home/node/.n8n
 RUN echo '{"nodes":{"include":["n8n-nodes-document-generator","n8n-nodes-chatwoot","n8n-nodes-imap","n8n-nodes-puppeteer"]}}' > n8n.json
 
+# Create startup script to ensure port is properly exposed
+RUN echo '#!/bin/sh' > /usr/local/bin/start-n8n.sh && \
+    echo 'echo "Starting n8n on port 5678..."' >> /usr/local/bin/start-n8n.sh && \
+    echo 'node --max-old-space-size=4096 /usr/local/lib/node_modules/n8n/bin/n8n start --port=5678' >> /usr/local/bin/start-n8n.sh && \
+    chmod +x /usr/local/bin/start-n8n.sh
+
 # Set permissions - CRITICAL: ensure node user has full access to all required directories
 RUN chown -R node:node /home/node
 RUN chmod -R 755 /home/node
 RUN chmod 700 /home/node/.n8n/.n8n
 RUN chown -R node:node /opt/render/project/src/custom-extensions
+RUN chown node:node /usr/local/bin/start-n8n.sh
 
 # We'll let n8n create its own config file with the correct encryption key
 # from the environment variable
@@ -75,6 +83,7 @@ ENV N8N_USER_FOLDER=/home/node/.n8n
 ENV N8N_CUSTOM_EXTENSIONS=/opt/render/project/src/custom-extensions
 ENV N8N_LOG_LEVEL=debug
 ENV PORT=5678
+ENV N8N_PORT=5678
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 # Puppeteer browser launch arguments for better performance in containerized environments
@@ -89,5 +98,5 @@ ENV N8N_CUSTOM_EXTENSIONS_EXCLUDE=mcp,mcpClient
 # Expose the port
 EXPOSE 5678
 
-# Override the default entrypoint to run n8n start with increased memory limit
-ENTRYPOINT ["node", "--max-old-space-size=4096", "/usr/local/lib/node_modules/n8n/bin/n8n", "start"]
+# Use our custom startup script
+ENTRYPOINT ["/usr/local/bin/start-n8n.sh"]
