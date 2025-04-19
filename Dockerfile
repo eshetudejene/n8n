@@ -58,7 +58,7 @@ RUN echo '{"nodes":{"include":["n8n-nodes-document-generator","n8n-nodes-chatwoo
 # Create startup script to ensure port is properly exposed
 RUN echo '#!/bin/sh' > /usr/local/bin/start-n8n.sh && \
     echo 'echo "Starting n8n on port 5678..."' >> /usr/local/bin/start-n8n.sh && \
-    echo 'node --max-old-space-size=4096 /usr/local/lib/node_modules/n8n/bin/n8n start --port=5678' >> /usr/local/bin/start-n8n.sh && \
+    echo 'node --max-old-space-size=4096 /usr/local/lib/node_modules/n8n/bin/n8n start' >> /usr/local/bin/start-n8n.sh && \
     chmod +x /usr/local/bin/start-n8n.sh
 
 # Set permissions - CRITICAL: ensure node user has full access to all required directories
