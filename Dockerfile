@@ -54,8 +54,40 @@ RUN cd /opt/render/project/src/custom-extensions/n8n-nodes-puppeteer && \
 WORKDIR /home/node/.n8n
 RUN echo '{"nodes":{"include":["n8n-nodes-document-generator","n8n-nodes-chatwoot","n8n-nodes-imap","n8n-nodes-puppeteer"]}}' > n8n.json
 
-# Copy custom init script
-COPY custom-init.sh /usr/local/bin/custom-init.sh
+# Create custom init script - using echo commands to avoid linting issues
+RUN echo '#!/bin/bash' > /usr/local/bin/custom-init.sh && \
+    echo '' >> /usr/local/bin/custom-init.sh && \
+    echo '# Remove custom MCP nodes if they exist' >> /usr/local/bin/custom-init.sh && \
+    echo 'echo "Checking for custom MCP nodes to remove..."' >> /usr/local/bin/custom-init.sh && \
+    echo '' >> /usr/local/bin/custom-init.sh && \
+    echo '# Check user folder locations' >> /usr/local/bin/custom-init.sh && \
+    echo 'if [ -d "/home/node/.n8n/custom/nodes/mcp" ]; then' >> /usr/local/bin/custom-init.sh && \
+    echo '  echo "Removing MCP nodes from user folder..."' >> /usr/local/bin/custom-init.sh && \
+    echo '  rm -rf /home/node/.n8n/custom/nodes/mcp' >> /usr/local/bin/custom-init.sh && \
+    echo 'fi' >> /usr/local/bin/custom-init.sh && \
+    echo '' >> /usr/local/bin/custom-init.sh && \
+    echo 'if [ -d "/home/node/.n8n/custom/nodes/mcpClient" ]; then' >> /usr/local/bin/custom-init.sh && \
+    echo '  echo "Removing MCP client nodes from user folder..."' >> /usr/local/bin/custom-init.sh && \
+    echo '  rm -rf /home/node/.n8n/custom/nodes/mcpClient' >> /usr/local/bin/custom-init.sh && \
+    echo 'fi' >> /usr/local/bin/custom-init.sh && \
+    echo '' >> /usr/local/bin/custom-init.sh && \
+    echo '# Check custom extensions locations' >> /usr/local/bin/custom-init.sh && \
+    echo 'if [ -d "/opt/render/project/src/custom-extensions/n8n-nodes-mcp" ]; then' >> /usr/local/bin/custom-init.sh && \
+    echo '  echo "Removing MCP nodes from custom extensions..."' >> /usr/local/bin/custom-init.sh && \
+    echo '  rm -rf /opt/render/project/src/custom-extensions/n8n-nodes-mcp' >> /usr/local/bin/custom-init.sh && \
+    echo 'fi' >> /usr/local/bin/custom-init.sh && \
+    echo '' >> /usr/local/bin/custom-init.sh && \
+    echo '# Check for any npm packages' >> /usr/local/bin/custom-init.sh && \
+    echo 'if npm list -g | grep -q "n8n-nodes-mcp"; then' >> /usr/local/bin/custom-init.sh && \
+    echo '  echo "Removing globally installed MCP nodes..."' >> /usr/local/bin/custom-init.sh && \
+    echo '  npm uninstall -g n8n-nodes-mcp' >> /usr/local/bin/custom-init.sh && \
+    echo 'fi' >> /usr/local/bin/custom-init.sh && \
+    echo '' >> /usr/local/bin/custom-init.sh && \
+    echo 'echo "Custom MCP nodes removal complete. Using native n8n MCP nodes instead."' >> /usr/local/bin/custom-init.sh && \
+    echo '' >> /usr/local/bin/custom-init.sh && \
+    echo '# Continue with normal startup' >> /usr/local/bin/custom-init.sh && \
+    echo 'exec "$@"' >> /usr/local/bin/custom-init.sh
+
 RUN chmod +x /usr/local/bin/custom-init.sh
 
 # Set permissions - CRITICAL: ensure node user has full access to all required directories
