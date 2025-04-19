@@ -50,15 +50,13 @@ RUN npm install n8n-nodes-puppeteer@1.4.1
 RUN cd /opt/render/project/src/custom-extensions/n8n-nodes-puppeteer && \
     npx puppeteer browsers install chrome
 
-# Install n8n-nodes-mcp
-RUN mkdir -p /opt/render/project/src/custom-extensions/n8n-nodes-mcp
-WORKDIR /opt/render/project/src/custom-extensions/n8n-nodes-mcp
-RUN npm init -y
-RUN npm install n8n-nodes-mcp@0.1.14
-
 # Create n8n.json configuration
 WORKDIR /home/node/.n8n
-RUN echo '{"nodes":{"include":["n8n-nodes-document-generator","n8n-nodes-chatwoot","n8n-nodes-imap","n8n-nodes-puppeteer","n8n-nodes-mcp"]}}' > n8n.json
+RUN echo '{"nodes":{"include":["n8n-nodes-document-generator","n8n-nodes-chatwoot","n8n-nodes-imap","n8n-nodes-puppeteer"]}}' > n8n.json
+
+# Copy custom init script
+COPY custom-init.sh /usr/local/bin/custom-init.sh
+RUN chmod +x /usr/local/bin/custom-init.sh
 
 # Set permissions - CRITICAL: ensure node user has full access to all required directories
 RUN chown -R node:node /home/node
@@ -92,5 +90,5 @@ ENV N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
 # Expose the port
 EXPOSE 5678
 
-# Override the default entrypoint to run n8n start with increased memory limit
-ENTRYPOINT ["node", "--max-old-space-size=4096", "/usr/local/lib/node_modules/n8n/bin/n8n", "start"]
+# Use our custom init script as entrypoint wrapper
+ENTRYPOINT ["/usr/local/bin/custom-init.sh", "node", "--max-old-space-size=4096", "/usr/local/lib/node_modules/n8n/bin/n8n", "start"]
