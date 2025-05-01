@@ -317,6 +317,8 @@ export class LoadNodesAndCredentials {
 						} as INodeTypeBaseDescription)
 					: deepCopy(usableNode);
 			const wrapped = this.convertNodeToAiTool({ description }).description;
+			// TODO: Remove this when we support partial execution on all tool nodes
+			wrapped.usableAsTool = true;
 
 			this.types.nodes.push(wrapped);
 			this.known.nodes[wrapped.name] = { ...this.known.nodes[usableNode.name] };
@@ -398,6 +400,13 @@ export class LoadNodesAndCredentials {
 		for (const postProcessor of this.postProcessors) {
 			await postProcessor();
 		}
+	}
+
+	recognizesNode(fullNodeType: string): boolean {
+		const [packageName, nodeType] = fullNodeType.split('.');
+		const { loaders } = this;
+		const loader = loaders[packageName];
+		return !!loader && nodeType in loader.known.nodes;
 	}
 
 	getNode(fullNodeType: string): LoadedClass<INodeType | IVersionedNodeType> {

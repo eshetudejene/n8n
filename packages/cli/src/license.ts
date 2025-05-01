@@ -1,4 +1,12 @@
 import { GlobalConfig } from '@n8n/config';
+import {
+	LICENSE_FEATURES,
+	LICENSE_QUOTAS,
+	UNLIMITED_LICENSE_QUOTA,
+	type BooleanLicenseFeature,
+	type NumericLicenseFeature,
+} from '@n8n/constants';
+import { OnLeaderStepdown, OnLeaderTakeover, OnShutdown } from '@n8n/decorators';
 import { Container, Service } from '@n8n/di';
 import type { TEntitlement, TFeatures, TLicenseBlock } from '@n8n_io/license-sdk';
 import { LicenseManager } from '@n8n_io/license-sdk';
@@ -6,18 +14,9 @@ import { InstanceSettings, Logger } from 'n8n-core';
 
 import config from '@/config';
 import { SettingsRepository } from '@/databases/repositories/settings.repository';
-import { OnShutdown } from '@/decorators/on-shutdown';
 import { LicenseMetricsService } from '@/metrics/license-metrics.service';
 
-import {
-	LICENSE_FEATURES,
-	LICENSE_QUOTAS,
-	N8N_VERSION,
-	SETTINGS_LICENSE_CERT_KEY,
-	Time,
-	UNLIMITED_LICENSE_QUOTA,
-} from './constants';
-import type { BooleanLicenseFeature, NumericLicenseFeature } from './interfaces';
+import { N8N_VERSION, SETTINGS_LICENSE_CERT_KEY, Time } from './constants';
 
 const LICENSE_RENEWAL_DISABLED_WARNING =
 	'Automatic license renewal is disabled. The license will not renew automatically, and access to licensed features may be lost!';
@@ -239,6 +238,10 @@ export class License {
 		return this.isFeatureEnabled(LICENSE_FEATURES.SAML);
 	}
 
+	isApiKeyScopesEnabled() {
+		return this.isFeatureEnabled(LICENSE_FEATURES.API_KEY_SCOPES);
+	}
+
 	isAiAssistantEnabled() {
 		return this.isFeatureEnabled(LICENSE_FEATURES.AI_ASSISTANT);
 	}
@@ -315,6 +318,18 @@ export class License {
 		return this.isFeatureEnabled(LICENSE_FEATURES.FOLDERS);
 	}
 
+	isInsightsSummaryEnabled() {
+		return this.isFeatureEnabled(LICENSE_FEATURES.INSIGHTS_VIEW_SUMMARY);
+	}
+
+	isInsightsDashboardEnabled() {
+		return this.isFeatureEnabled(LICENSE_FEATURES.INSIGHTS_VIEW_DASHBOARD);
+	}
+
+	isInsightsHourlyDataEnabled() {
+		return this.getFeatureValue(LICENSE_FEATURES.INSIGHTS_VIEW_HOURLY_DATA);
+	}
+
 	getCurrentEntitlements() {
 		return this.manager?.getCurrentEntitlements() ?? [];
 	}
@@ -377,6 +392,18 @@ export class License {
 		);
 	}
 
+	getInsightsMaxHistory() {
+		return this.getFeatureValue(LICENSE_QUOTAS.INSIGHTS_MAX_HISTORY_DAYS) ?? 7;
+	}
+
+	getInsightsRetentionMaxAge() {
+		return this.getFeatureValue(LICENSE_QUOTAS.INSIGHTS_RETENTION_MAX_AGE_DAYS) ?? 180;
+	}
+
+	getInsightsRetentionPruneInterval() {
+		return this.getFeatureValue(LICENSE_QUOTAS.INSIGHTS_RETENTION_PRUNE_INTERVAL_DAYS) ?? 24;
+	}
+
 	getTeamProjectLimit() {
 		return this.getFeatureValue(LICENSE_QUOTAS.TEAM_PROJECT_LIMIT) ?? 0;
 	}
@@ -421,10 +448,12 @@ export class License {
 		}
 	}
 
+	@OnLeaderTakeover()
 	enableAutoRenewals() {
 		this.manager?.enableAutoRenewals();
 	}
 
+	@OnLeaderStepdown()
 	disableAutoRenewals() {
 		this.manager?.disableAutoRenewals();
 	}
