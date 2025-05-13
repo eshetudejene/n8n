@@ -51,6 +51,7 @@ export const CREDENTIAL_SELECT_MODAL_KEY = 'selectCredential';
 export const DELETE_USER_MODAL_KEY = 'deleteUser';
 export const INVITE_USER_MODAL_KEY = 'inviteUser';
 export const DUPLICATE_MODAL_KEY = 'duplicate';
+export const IMPORT_WORKFLOW_URL_MODAL_KEY = 'importWorkflowUrl';
 export const TAGS_MANAGER_MODAL_KEY = 'tagsManager';
 export const ANNOTATION_TAGS_MANAGER_MODAL_KEY = 'annotationTagsManager';
 export const VERSIONS_MODAL_KEY = 'versions';
@@ -124,6 +125,7 @@ export const CALENDLY_TRIGGER_NODE_TYPE = 'n8n-nodes-base.calendlyTrigger';
 export const CODE_NODE_TYPE = 'n8n-nodes-base.code';
 export const AI_CODE_NODE_TYPE = '@n8n/n8n-nodes-langchain.code';
 export const AI_MCP_TOOL_NODE_TYPE = '@n8n/n8n-nodes-langchain.mcpClientTool';
+export const WIKIPEDIA_TOOL_NODE_TYPE = '@n8n/n8n-nodes-langchain.toolWikipedia';
 export const CRON_NODE_TYPE = 'n8n-nodes-base.cron';
 export const CLEARBIT_NODE_TYPE = 'n8n-nodes-base.clearbit';
 export const FILTER_NODE_TYPE = 'n8n-nodes-base.filter';
@@ -214,6 +216,7 @@ export const GITHUB_NODE_TYPE = 'n8n-nodes-base.github';
 export const SLACK_TRIGGER_NODE_TYPE = 'n8n-nodes-base.slackTrigger';
 export const TELEGRAM_TRIGGER_NODE_TYPE = 'n8n-nodes-base.telegramTrigger';
 export const FACEBOOK_LEAD_ADS_TRIGGER_NODE_TYPE = 'n8n-nodes-base.facebookLeadAdsTrigger';
+export const RESPOND_TO_WEBHOOK_NODE_TYPE = 'n8n-nodes-base.respondToWebhook';
 
 export const CREDENTIAL_ONLY_NODE_PREFIX = 'n8n-creds-base';
 export const CREDENTIAL_ONLY_HTTP_NODE_VERSION = 4.1;
@@ -480,6 +483,7 @@ export const LOCAL_STORAGE_HIDE_GITHUB_STAR_BUTTON = 'N8N_HIDE_HIDE_GITHUB_STAR_
 export const LOCAL_STORAGE_NDV_INPUT_PANEL_DISPLAY_MODE = 'N8N_NDV_INPUT_PANEL_DISPLAY_MODE';
 export const LOCAL_STORAGE_NDV_OUTPUT_PANEL_DISPLAY_MODE = 'N8N_NDV_OUTPUT_PANEL_DISPLAY_MODE';
 export const LOCAL_STORAGE_LOGS_PANEL_OPEN = 'N8N_LOGS_PANEL_OPEN';
+export const LOCAL_STORAGE_WORKFLOW_LIST_PREFERENCES_KEY = 'N8N_WORKFLOWS_LIST_PREFERENCES';
 export const BASE_NODE_SURVEY_URL = 'https://n8n-community.typeform.com/to/BvmzxqYv#nodename=';
 export const COMMUNITY_PLUS_DOCS_URL =
 	'https://docs.n8n.io/hosting/community-edition-features/#registered-community-edition';
@@ -562,6 +566,9 @@ export const enum VIEWS {
 	FOLDERS = 'Folders',
 	PROJECTS_FOLDERS = 'ProjectsFolders',
 	INSIGHTS = 'Insights',
+	SHARED_WITH_ME = 'SharedWithMe',
+	SHARED_WORKFLOWS = 'SharedWorkflows',
+	SHARED_CREDENTIALS = 'SharedCredentials',
 }
 
 export const EDITABLE_CANVAS_VIEWS = [VIEWS.WORKFLOW, VIEWS.NEW_WORKFLOW, VIEWS.EXECUTION_DEBUG];
@@ -613,6 +620,8 @@ export const enum WORKFLOW_MENU_ACTIONS {
 	PUSH = 'push',
 	SETTINGS = 'settings',
 	DELETE = 'delete',
+	ARCHIVE = 'archive',
+	UNARCHIVE = 'unarchive',
 	SWITCH_NODE_VIEW_VERSION = 'switch-node-view-version',
 	RENAME = 'rename',
 }
@@ -755,12 +764,6 @@ export const AI_CREDITS_EXPERIMENT = {
 	variant: 'variant',
 };
 
-export const SCHEMA_PREVIEW_EXPERIMENT = {
-	name: '028_schema_preview',
-	control: 'control',
-	variant: 'variant',
-};
-
 export const WORKFLOW_BUILDER_EXPERIMENT = {
 	name: '30_workflow_builder',
 	control: 'control',
@@ -771,7 +774,6 @@ export const EXPERIMENTS_TO_TRACK = [
 	CREDENTIAL_DOCS_EXPERIMENT.name,
 	EASY_AI_WORKFLOW_EXPERIMENT.name,
 	AI_CREDITS_EXPERIMENT.name,
-	SCHEMA_PREVIEW_EXPERIMENT.name,
 	WORKFLOW_BUILDER_EXPERIMENT.name,
 ];
 
@@ -794,6 +796,7 @@ export const NODE_TYPES_EXCLUDED_FROM_OUTPUT_NAME_APPEND = [
 	FILTER_NODE_TYPE,
 	SWITCH_NODE_TYPE,
 	REMOVE_DUPLICATES_NODE_TYPE,
+	RESPOND_TO_WEBHOOK_NODE_TYPE,
 ];
 
 type ClearOutgoingConnectonsEvents = {

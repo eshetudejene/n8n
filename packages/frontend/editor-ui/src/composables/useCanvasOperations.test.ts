@@ -2990,19 +2990,19 @@ describe('useCanvasOperations', () => {
 			});
 
 			expect(workflowsStore.setConnections).toHaveBeenCalledWith(workflow.connections);
-			expect(workflowsStore.addNode).toHaveBeenCalledWith({
+			expect(workflowsStore.addNode).toHaveBeenNthCalledWith(1, {
 				...nodeA,
 				credentials: {},
 				disabled: false,
 			});
 			expect(workflowsStore.setNodePristine).toHaveBeenCalledWith(nodeA.name, true);
-			expect(workflowsStore.addNode).toHaveBeenCalledWith({
+			expect(workflowsStore.addNode).toHaveBeenNthCalledWith(2, {
 				...nodeB,
 				credentials: {},
 				disabled: false,
 			});
 			expect(workflowsStore.setNodePristine).toHaveBeenCalledWith(nodeB.name, true);
-			expect(workflowsStore.getNewWorkflowData).toHaveBeenCalledWith(
+			expect(workflowsStore.getNewWorkflowDataAndMakeShareable).toHaveBeenCalledWith(
 				templateName,
 				projectsStore.currentProjectId,
 			);
