@@ -34,6 +34,7 @@ import type { EventBus } from '@n8n/utils/event-bus';
 import { createEventBus } from '@n8n/utils/event-bus';
 import isEqual from 'lodash/isEqual';
 import CanvasNodeTrigger from '@/components/canvas/elements/nodes/render-types/parts/CanvasNodeTrigger.vue';
+import { CONFIGURATION_NODE_OFFSET, GRID_SIZE } from '@/utils/nodeViewUtils';
 
 type Props = NodeProps<CanvasNodeData> & {
 	readOnly?: boolean;
@@ -71,7 +72,7 @@ const props = defineProps<Props>();
 
 const contextMenu = useContextMenu();
 
-const { connectingHandle } = useCanvas();
+const { connectingHandle, isExperimentalNdvActive } = useCanvas();
 
 /*
   Toolbar slot classes
@@ -183,6 +184,12 @@ const createEndpointMappingFn =
 			connectingHandle.value?.nodeId === props.id &&
 			connectingHandle.value?.handleType === handleType &&
 			connectingHandle.value?.handleId === handleId;
+		const offsetValue =
+			position === Position.Bottom
+				? `${GRID_SIZE * 2 * (1 + index * 2) + CONFIGURATION_NODE_OFFSET}px`
+				: isExperimentalNdvActive.value && endpoints.length === 1
+					? `${(1 + index) * (GRID_SIZE * 1.5)}px`
+					: `${(100 / (endpoints.length + 1)) * (index + 1)}%`;
 
 		return {
 			...endpoint,
@@ -191,7 +198,7 @@ const createEndpointMappingFn =
 			isConnecting,
 			position,
 			offset: {
-				[offsetAxis]: `${(100 / (endpoints.length + 1)) * (index + 1)}%`,
+				[offsetAxis]: offsetValue,
 			},
 		};
 	};
@@ -407,6 +414,7 @@ onBeforeUnmount(() => {
 			:disabled="isDisabled"
 			:read-only="readOnly"
 			:class="$style.trigger"
+			:is-experimental-ndv-active="isExperimentalNdvActive"
 		/>
 	</div>
 </template>
@@ -427,7 +435,7 @@ onBeforeUnmount(() => {
 	position: absolute;
 	top: 0;
 	left: 50%;
-	transform: translate(-50%, -100%);
+	transform: translate(-50%, -100%) scale(var(--canvas-zoom-compensation-factor, 1));
 	opacity: 0;
 	z-index: 1;
 
