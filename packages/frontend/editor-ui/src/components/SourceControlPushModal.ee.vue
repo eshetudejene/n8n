@@ -566,6 +566,10 @@ function castProject(project: ProjectListItem) {
 const workflowDiffEventBus = createEventBus();
 
 function openDiffModal(id: string) {
+	telemetry.track('User clicks compare workflows', {
+		workflow_id: id,
+		context: 'source_control_push',
+	});
 	uiStore.openModalWithData({
 		name: WORKFLOW_DIFF_MODAL_KEY,
 		data: { eventBus: workflowDiffEventBus, workflowId: id, direction: 'push' },
@@ -860,7 +864,7 @@ function openDiffModal(id: string) {
 					:placeholder="
 						i18n.baseText('settings.sourceControl.modals.push.commitMessage.placeholder')
 					"
-					@keydown.enter="onCommitKeyDownEnter"
+					@keydown.enter.stop="onCommitKeyDownEnter"
 				/>
 				<N8nButton
 					data-test-id="source-control-push-modal-submit"
