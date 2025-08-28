@@ -9,6 +9,7 @@ import { createTestingPinia } from '@pinia/testing';
 import { createRouter, createWebHistory } from 'vue-router';
 import type { DataStoreResource } from '@/features/dataStore/types';
 import { useDataStoreStore } from '@/features/dataStore/dataStore.store';
+
 vi.mock('@/composables/useProjectPages', () => ({
 	useProjectPages: vi.fn().mockReturnValue({
 		isOverviewSubPage: false,
@@ -23,7 +24,7 @@ vi.mock('@n8n/i18n', async (importOriginal) => {
 		...actualObj,
 		useI18n: vi.fn(() => ({
 			baseText: vi.fn((key: string) => {
-				if (key === 'dataStore.tab.label') return 'Data Store';
+				if (key === 'dataStore.dataStores') return 'Data Stores';
 				if (key === 'projects.menu.personal') return 'Personal';
 				if (key === 'dataStore.empty.label') return 'No data stores';
 				if (key === 'dataStore.empty.description') return 'No data stores description';
@@ -68,7 +69,7 @@ const router = createRouter({
 	history: createWebHistory(),
 	routes: [
 		{
-			path: '/projects/:projectId/data-stores',
+			path: '/projects/:projectId/data-tables',
 			component: { template: '<div></div>' },
 		},
 		{
@@ -112,7 +113,7 @@ const TEST_DATA_STORE: DataStoreResource = {
 describe('DataStoreView', () => {
 	beforeEach(async () => {
 		vi.clearAllMocks();
-		await router.push('/projects/test-project/data-stores');
+		await router.push('/projects/test-project/data-tables');
 		await router.isReady();
 
 		pinia = createTestingPinia({ initialState });
@@ -142,7 +143,7 @@ describe('DataStoreView', () => {
 			renderComponent({ pinia });
 			await waitAllPromises();
 
-			expect(mockDocumentTitle.set).toHaveBeenCalledWith('Data Store');
+			expect(mockDocumentTitle.set).toHaveBeenCalledWith('Data Stores');
 		});
 
 		it('should handle initialization error', async () => {

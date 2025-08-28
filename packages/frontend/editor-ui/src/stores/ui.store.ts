@@ -44,6 +44,8 @@ import {
 	LOCAL_STORAGE_THEME,
 	WHATS_NEW_MODAL_KEY,
 	WORKFLOW_DIFF_MODAL_KEY,
+	PRE_BUILT_AGENTS_MODAL_KEY,
+	EXPERIMENT_TEMPLATE_RECO_V2_KEY,
 } from '@/constants';
 import { STORES } from '@n8n/stores';
 import type {
@@ -125,7 +127,7 @@ export const useUIStore = defineStore(STORES.UI, () => {
 				PROJECT_MOVE_RESOURCE_MODAL,
 				NEW_ASSISTANT_SESSION_MODAL,
 				IMPORT_WORKFLOW_URL_MODAL_KEY,
-				WHATS_NEW_MODAL_KEY,
+				PRE_BUILT_AGENTS_MODAL_KEY,
 				WORKFLOW_DIFF_MODAL_KEY,
 			].map((modalKey) => [modalKey, { open: false }]),
 		),
@@ -219,6 +221,12 @@ export const useUIStore = defineStore(STORES.UI, () => {
 				articleId: undefined,
 			},
 		},
+		[EXPERIMENT_TEMPLATE_RECO_V2_KEY]: {
+			open: false,
+			data: {
+				nodeName: '',
+			},
+		},
 	});
 
 	const modalStack = ref<string[]>([]);
@@ -243,11 +251,11 @@ export const useUIStore = defineStore(STORES.UI, () => {
 	 * Module name is also added to the key so that we can check if the module is active
 	 * when tabs are rendered.\
 	 * @example
-	 * uiStore.registerCustomTabs('overview', 'data-store', [
+	 * uiStore.registerCustomTabs('overview', 'data-table', [
 	 *   {
-	 *     label: 'Data Store',
-	 *     value: 'data-store',
-	 *     to: { name: 'data-store' },
+	 *     label: 'Data Table',
+	 *     value: 'data-table',
+	 *     to: { name: 'data-table' },
 	 *   },
 	 * ]);
 	 */
