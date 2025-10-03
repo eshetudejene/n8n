@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import BreakpointsObserver from '@/components/BreakpointsObserver.vue';
+import EnterpriseEdition from '@/components/EnterpriseEdition.ee.vue';
+import FolderBreadcrumbs from '@/components/Folders/FolderBreadcrumbs.vue';
 import CollaborationPane from '@/components/MainHeader/CollaborationPane.vue';
 import WorkflowHistoryButton from '@/components/MainHeader/WorkflowHistoryButton.vue';
 import PushConnectionTracker from '@/components/PushConnectionTracker.vue';
@@ -51,7 +53,6 @@ import { useNpsSurveyStore } from '@/stores/npsSurvey.store';
 import { ProjectTypes } from '@/types/projects.types';
 import { sanitizeFilename } from '@/utils/fileUtils';
 import { hasPermission } from '@/utils/rbac/permissions';
-import { N8nInlineTextEdit } from '@n8n/design-system';
 import type { PathItem } from '@n8n/design-system/components/N8nBreadcrumbs/Breadcrumbs.vue';
 import { type BaseTextKey, useI18n } from '@n8n/i18n';
 import { getResourcePermissions } from '@n8n/permissions';
@@ -62,8 +63,20 @@ import { computed, ref, useCssModule, useTemplateRef, watch } from 'vue';
 import { I18nT } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 
-const WORKFLOW_NAME_MAX_WIDTH_SMALL_SCREENS = 150;
-const WORKFLOW_NAME_MAX_WIDTH_WIDE_SCREENS = 200;
+import {
+	N8nActionDropdown,
+	N8nBadge,
+	N8nButton,
+	N8nInlineTextEdit,
+	N8nTooltip,
+} from '@n8n/design-system';
+const WORKFLOW_NAME_BP_TO_WIDTH: { [key: string]: number } = {
+	XS: 150,
+	SM: 200,
+	MD: 250,
+	LG: 500,
+	XL: 1000,
+};
 
 const props = defineProps<{
 	readOnly?: boolean;
@@ -142,8 +155,8 @@ const onExecutionsTab = computed(() => {
 
 const workflowPermissions = computed(() => getResourcePermissions(props.scopes).workflow);
 
-const workflowMenuItems = computed<ActionDropdownItem[]>(() => {
-	const actions: ActionDropdownItem[] = [
+const workflowMenuItems = computed<Array<ActionDropdownItem<WORKFLOW_MENU_ACTIONS>>>(() => {
+	const actions: Array<ActionDropdownItem<WORKFLOW_MENU_ACTIONS>> = [
 		{
 			id: WORKFLOW_MENU_ACTIONS.DOWNLOAD,
 			label: locale.baseText('menuActions.download'),
@@ -429,8 +442,7 @@ async function handleFileImport(): Promise<void> {
 	}
 }
 
-async function onWorkflowMenuSelect(value: string): Promise<void> {
-	const action = value as WORKFLOW_MENU_ACTIONS;
+async function onWorkflowMenuSelect(action: WORKFLOW_MENU_ACTIONS): Promise<void> {
 	switch (action) {
 		case WORKFLOW_MENU_ACTIONS.DUPLICATE: {
 			uiStore.openModalWithData({
@@ -736,11 +748,7 @@ const onBreadcrumbsItemSelected = (item: PathItem) => {
 							class="name"
 							:model-value="name"
 							:max-length="MAX_WORKFLOW_NAME_LENGTH"
-							:max-width="
-								['XS', 'SM'].includes(bp)
-									? WORKFLOW_NAME_MAX_WIDTH_SMALL_SCREENS
-									: WORKFLOW_NAME_MAX_WIDTH_WIDE_SCREENS
-							"
+							:max-width="WORKFLOW_NAME_BP_TO_WIDTH[bp]"
 							:read-only="readOnly || isArchived || (!isNewWorkflow && !workflowPermissions.update)"
 							:disabled="readOnly || isArchived || (!isNewWorkflow && !workflowPermissions.update)"
 							@update:model-value="onNameSubmit"

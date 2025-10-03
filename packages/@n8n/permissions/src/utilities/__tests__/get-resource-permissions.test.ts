@@ -28,12 +28,14 @@ describe('permissions', () => {
 			tag: {},
 			user: {},
 			variable: {},
+			projectVariable: {},
 			workersView: {},
 			workflow: {},
 			workflowTags: {},
 			folder: {},
 			insights: {},
 			dataStore: {},
+			role: {},
 		});
 	});
 	it('getResourcePermissions', () => {
@@ -56,6 +58,8 @@ describe('permissions', () => {
 			'user:list',
 			'variable:list',
 			'variable:read',
+			'projectVariable:list',
+			'projectVariable:read',
 			'workflow:create',
 			'workflow:delete',
 			'workflow:execute',
@@ -114,6 +118,10 @@ describe('permissions', () => {
 				list: true,
 				read: true,
 			},
+			projectVariable: {
+				list: true,
+				read: true,
+			},
 			workersView: {},
 			workflow: {
 				create: true,
@@ -134,6 +142,7 @@ describe('permissions', () => {
 			dataStore: {},
 			execution: {},
 			workflowTags: {},
+			role: {},
 		};
 
 		expect(getResourcePermissions(scopes)).toEqual(permissionRecord);

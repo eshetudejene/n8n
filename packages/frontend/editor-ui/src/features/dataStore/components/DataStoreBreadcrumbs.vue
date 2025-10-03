@@ -8,7 +8,10 @@ import DataStoreActions from '@/features/dataStore/components/DataStoreActions.v
 import { PROJECT_DATA_STORES } from '@/features/dataStore/constants';
 import { useDataStoreStore } from '@/features/dataStore/dataStore.store';
 import { useToast } from '@/composables/useToast';
+import { telemetry } from '@/plugins/telemetry';
 
+import { N8nBreadcrumbs, N8nInlineTextEdit } from '@n8n/design-system';
+import ProjectBreadcrumb from '@/components/Folders/ProjectBreadcrumb.vue';
 const BREADCRUMBS_SEPARATOR = '/';
 
 type Props = {
@@ -77,6 +80,10 @@ const onNameSubmit = async (name: string) => {
 			throw new Error(i18n.baseText('generic.unknownError'));
 		}
 		editableName.value = name;
+		telemetry.track('User renamed data table', {
+			data_table_id: props.dataStore.id,
+			data_table_project_id: props.dataStore.projectId,
+		});
 	} catch (error) {
 		// Revert to original name if rename fails
 		editableName.value = props.dataStore.name;
@@ -94,7 +101,7 @@ watch(
 
 <template>
 	<div :class="$style['data-store-breadcrumbs']">
-		<n8n-breadcrumbs
+		<N8nBreadcrumbs
 			:items="breadcrumbs"
 			:separator="BREADCRUMBS_SEPARATOR"
 			:highlight-last-item="false"
@@ -117,7 +124,7 @@ watch(
 					@update:model-value="onNameSubmit"
 				/>
 			</template>
-		</n8n-breadcrumbs>
+		</N8nBreadcrumbs>
 		<div :class="$style['data-store-actions']">
 			<DataStoreActions
 				:data-store="props.dataStore"
@@ -132,11 +139,12 @@ watch(
 <style lang="scss" module>
 .data-store-breadcrumbs {
 	display: flex;
-	align-items: end;
+	align-items: center;
 }
 
 .data-store-actions {
 	position: relative;
+	top: var(--spacing-5xs);
 }
 
 .separator {

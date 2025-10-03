@@ -19,21 +19,6 @@ import {
 	SOURCE_CONTROL_FILE_STATUS,
 	SOURCE_CONTROL_FILE_TYPE,
 } from '@n8n/api-types';
-import {
-	N8nBadge,
-	N8nButton,
-	N8nCallout,
-	N8nHeading,
-	N8nIcon,
-	N8nInput,
-	N8nInputLabel,
-	N8nLink,
-	N8nNotice,
-	N8nOption,
-	N8nPopover,
-	N8nSelect,
-	N8nText,
-} from '@n8n/design-system';
 import { useI18n } from '@n8n/i18n';
 import type { EventBus } from '@n8n/utils/event-bus';
 import { refDebounced, useStorage } from '@vueuse/core';
@@ -44,7 +29,26 @@ import { useRoute, useRouter } from 'vue-router';
 import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css';
 import Modal from './Modal.vue';
-
+import ProjectSharing from './Projects/ProjectSharing.vue';
+import {
+	N8nBadge,
+	N8nButton,
+	N8nCallout,
+	N8nCheckbox,
+	N8nHeading,
+	N8nIcon,
+	N8nIconButton,
+	N8nInfoTip,
+	N8nInput,
+	N8nInputLabel,
+	N8nLink,
+	N8nNotice,
+	N8nOption,
+	N8nPopover,
+	N8nSelect,
+	N8nText,
+	N8nTooltip,
+} from '@n8n/design-system';
 const props = defineProps<{
 	data: { eventBus: EventBus; status?: SourceControlledFile[] };
 }>();
@@ -889,12 +893,17 @@ onMounted(async () => {
 													{{ getStatusText(file.status) }}
 												</N8nBadge>
 												<template v-if="isWorkflowDiffsEnabled">
-													<N8nIconButton
+													<N8nTooltip
 														v-if="file.type === SOURCE_CONTROL_FILE_TYPE.workflow"
-														icon="file-diff"
-														type="secondary"
-														@click="openDiffModal(file.id)"
-													/>
+														:content="i18n.baseText('workflowDiff.compare')"
+														placement="top"
+													>
+														<N8nIconButton
+															icon="file-diff"
+															type="secondary"
+															@click="openDiffModal(file.id)"
+														/>
+													</N8nTooltip>
 												</template>
 											</span>
 										</N8nCheckbox>
