@@ -9,10 +9,10 @@ import type {
 	CanvasInjectionData,
 	CanvasNodeHandleInjectionData,
 	CanvasNodeInjectionData,
-} from '@/types';
+} from '@/features/canvas/canvas.types';
 import type { ComputedRef, InjectionKey, Ref } from 'vue';
 import type { ExpressionLocalResolveContext } from './types/expressions';
-import { DATA_STORE_MODULE_NAME } from './features/dataStore/constants';
+import { DATA_TABLE_MODULE_NAME } from './features/dataTable/constants';
 import type { TelemetryContext } from './types/telemetry';
 import type { IconName } from '@n8n/design-system/src/components/N8nIcon/icons';
 import type { WorkflowState } from './composables/useWorkflowState';
@@ -52,7 +52,6 @@ export const CHAT_EMBED_MODAL_KEY = 'chatEmbed';
 export const CHANGE_PASSWORD_MODAL_KEY = 'changePassword';
 export const CONFIRM_PASSWORD_MODAL_KEY = 'confirmPassword';
 export const CREDENTIAL_EDIT_MODAL_KEY = 'editCredential';
-export const API_KEY_CREATE_OR_EDIT_MODAL_KEY = 'createOrEditApiKey';
 export const CREDENTIAL_SELECT_MODAL_KEY = 'selectCredential';
 export const DELETE_USER_MODAL_KEY = 'deleteUser';
 export const INVITE_USER_MODAL_KEY = 'inviteUser';
@@ -72,8 +71,6 @@ export const COMMUNITY_PACKAGE_INSTALL_MODAL_KEY = 'communityPackageInstall';
 export const COMMUNITY_PACKAGE_CONFIRM_MODAL_KEY = 'communityPackageManageConfirm';
 export const IMPORT_CURL_MODAL_KEY = 'importCurl';
 export const LOG_STREAM_MODAL_KEY = 'settingsLogStream';
-export const SOURCE_CONTROL_PUSH_MODAL_KEY = 'sourceControlPush';
-export const SOURCE_CONTROL_PULL_MODAL_KEY = 'sourceControlPull';
 export const DEBUG_PAYWALL_MODAL_KEY = 'debugPaywall';
 export const MFA_SETUP_MODAL_KEY = 'mfaSetup';
 export const PROMPT_MFA_CODE_MODAL_KEY = 'promptMfaCode';
@@ -83,8 +80,6 @@ export const PROJECT_MOVE_RESOURCE_MODAL = 'projectMoveResourceModal';
 export const NEW_ASSISTANT_SESSION_MODAL = 'newAssistantSession';
 export const EXTERNAL_SECRETS_PROVIDER_MODAL_KEY = 'externalSecretsProvider';
 export const COMMUNITY_PLUS_ENROLLMENT_MODAL = 'communityPlusEnrollment';
-export const DELETE_FOLDER_MODAL_KEY = 'deleteFolder';
-export const MOVE_FOLDER_MODAL_KEY = 'moveFolder';
 export const WORKFLOW_ACTIVATION_CONFLICTING_WEBHOOK_MODAL_KEY =
 	'workflowActivationConflictingWebhook';
 export const FROM_AI_PARAMETERS_MODAL_KEY = 'fromAiParameters';
@@ -92,6 +87,8 @@ export const WORKFLOW_EXTRACTION_NAME_MODAL_KEY = 'workflowExtractionName';
 export const WHATS_NEW_MODAL_KEY = 'whatsNew';
 export const WORKFLOW_DIFF_MODAL_KEY = 'workflowDiff';
 export const PRE_BUILT_AGENTS_MODAL_KEY = 'preBuiltAgents';
+export const VARIABLE_MODAL_KEY = 'variableModal';
+export const CHAT_HUB_SIDE_MENU_DRAWER_MODAL_KEY = 'chatHubSideMenuDrawer';
 export const EXPERIMENT_TEMPLATE_RECO_V2_KEY = 'templateRecoV2';
 export const EXPERIMENT_TEMPLATE_RECO_V3_KEY = 'templateRecoV3';
 
@@ -230,8 +227,8 @@ export const SLACK_TRIGGER_NODE_TYPE = 'n8n-nodes-base.slackTrigger';
 export const TELEGRAM_TRIGGER_NODE_TYPE = 'n8n-nodes-base.telegramTrigger';
 export const FACEBOOK_LEAD_ADS_TRIGGER_NODE_TYPE = 'n8n-nodes-base.facebookLeadAdsTrigger';
 export const RESPOND_TO_WEBHOOK_NODE_TYPE = 'n8n-nodes-base.respondToWebhook';
-export const DATA_STORE_NODE_TYPE = 'n8n-nodes-base.dataTable';
-export const DATA_STORE_TOOL_NODE_TYPE = 'n8n-nodes-base.dataTableTool';
+export const DATA_TABLE_NODE_TYPE = 'n8n-nodes-base.dataTable';
+export const DATA_TABLE_TOOL_NODE_TYPE = 'n8n-nodes-base.dataTableTool';
 
 export const CREDENTIAL_ONLY_NODE_PREFIX = 'n8n-creds-base';
 export const CREDENTIAL_ONLY_HTTP_NODE_VERSION = 4.1;
@@ -239,7 +236,7 @@ export const CREDENTIAL_ONLY_HTTP_NODE_VERSION = 4.1;
 // template categories
 export const TEMPLATE_CATEGORY_AI = 'categories/ai';
 
-export const DATA_STORE_NODES = [DATA_STORE_NODE_TYPE, DATA_STORE_TOOL_NODE_TYPE];
+export const DATA_TABLE_NODES = [DATA_TABLE_NODE_TYPE, DATA_TABLE_TOOL_NODE_TYPE];
 
 export const EXECUTABLE_TRIGGER_NODE_TYPES = [
 	START_NODE_TYPE,
@@ -262,7 +259,7 @@ export const NODES_USING_CODE_NODE_EDITOR = [
 	AI_TRANSFORM_NODE_TYPE,
 ];
 export const MODULE_ENABLED_NODES = [
-	...DATA_STORE_NODES.map((nodeType) => ({ nodeType, module: DATA_STORE_MODULE_NAME })),
+	...DATA_TABLE_NODES.map((nodeType) => ({ nodeType, module: DATA_TABLE_MODULE_NAME })),
 ];
 
 export const NODE_POSITION_CONFLICT_ALLOWLIST = [STICKY_NODE_TYPE];
@@ -298,6 +295,7 @@ export const NODE_CREATOR_OPEN_SOURCES: Record<
 	ADD_NODE_BUTTON: 'add_node_button',
 	TAB: 'tab',
 	NODE_CONNECTION_ACTION: 'node_connection_action',
+	REPLACE_NODE_ACTION: 'replace_node_action',
 	NODE_CONNECTION_DROP: 'node_connection_drop',
 	NOTICE_ERROR_MESSAGE: 'notice_error_message',
 	CONTEXT_MENU: 'context_menu',
@@ -480,28 +478,6 @@ export const MODAL_CANCEL = 'cancel';
 export const MODAL_CONFIRM = 'confirm';
 export const MODAL_CLOSE = 'close';
 
-export const ILLEGAL_FOLDER_CHARACTERS = [
-	'[',
-	']',
-	'^',
-	'\\',
-	'/',
-	':',
-	'*',
-	'?',
-	'"',
-	'<',
-	'>',
-	'|',
-];
-export const FOLDER_NAME_ILLEGAL_CHARACTERS_REGEX = new RegExp(
-	`[${ILLEGAL_FOLDER_CHARACTERS.map((char) => {
-		return char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-	}).join('')}]`,
-);
-
-export const FOLDER_NAME_ONLY_DOTS_REGEX = /^\.+$/;
-export const FOLDER_NAME_MAX_LENGTH = 100;
 export const VALID_EMAIL_REGEX =
 	/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 export const VALID_WORKFLOW_IMPORT_URL_REGEX = /^http[s]?:\/\/.*\.json$/i;
@@ -532,6 +508,10 @@ export const LOCAL_STORAGE_FOCUS_PANEL = 'N8N_FOCUS_PANEL';
 export const LOCAL_STORAGE_EXPERIMENTAL_DISMISSED_SUGGESTED_WORKFLOWS =
 	'N8N_EXPERIMENTAL_DISMISSED_SUGGESTED_WORKFLOWS';
 export const LOCAL_STORAGE_RUN_DATA_WORKER = 'N8N_RUN_DATA_WORKER';
+export const LOCAL_STORAGE_CHAT_HUB_SELECTED_MODEL = (userId: string) =>
+	`${userId}_N8N_CHAT_HUB_SELECTED_MODEL`;
+export const LOCAL_STORAGE_CHAT_HUB_CREDENTIALS = (userId: string) =>
+	`${userId}_N8N_CHAT_HUB_CREDENTIALS`;
 
 export const BASE_NODE_SURVEY_URL = 'https://n8n-community.typeform.com/to/BvmzxqYv#nodename=';
 export const COMMUNITY_PLUS_DOCS_URL =
@@ -612,6 +592,8 @@ export const enum VIEWS {
 	PROJECTS_CREDENTIALS = 'ProjectsCredentials',
 	PROJECT_SETTINGS = 'ProjectSettings',
 	PROJECTS_EXECUTIONS = 'ProjectsExecutions',
+	PROJECTS_VARIABLES = 'ProjectsVariables',
+	HOME_VARIABLES = 'HomeVariables',
 	FOLDERS = 'Folders',
 	PROJECTS_FOLDERS = 'ProjectsFolders',
 	INSIGHTS = 'Insights',
@@ -844,8 +826,21 @@ export const READY_TO_RUN_V2_EXPERIMENT = {
 	variant2: 'variant-2-twoboxes',
 };
 
+export const READY_TO_RUN_V2_PART2_EXPERIMENT = {
+	name: '045_ready-to-run-worfklow_v2-2',
+	control: 'control',
+	variant3: 'variant-3',
+	variant4: 'variant-4',
+};
+
 export const PERSONALIZED_TEMPLATES_V3 = {
 	name: '044_template_reco_v3',
+	control: 'control',
+	variant: 'variant',
+};
+
+export const PROJECT_VARIABLES_EXPERIMENT = {
+	name: '046_project_variables',
 	control: 'control',
 	variant: 'variant',
 };
@@ -861,6 +856,8 @@ export const EXPERIMENTS_TO_TRACK = [
 	TEMPLATE_RECO_V2.name,
 	READY_TO_RUN_V2_EXPERIMENT.name,
 	PERSONALIZED_TEMPLATES_V3.name,
+	READY_TO_RUN_V2_PART2_EXPERIMENT.name,
+	PROJECT_VARIABLES_EXPERIMENT.name,
 ];
 
 export const MFA_FORM = {
