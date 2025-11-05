@@ -2,7 +2,7 @@
  * Maximum length of user prompt message in characters.
  * Prevents excessively long messages that could consume too many tokens.
  */
-export const MAX_AI_BUILDER_PROMPT_LENGTH = 1000; // characters
+export const MAX_AI_BUILDER_PROMPT_LENGTH = 5000; // characters
 
 /**
  * Token limits for the LLM context window.
@@ -35,4 +35,4 @@ export const MAX_WORKFLOW_LENGTH_TOKENS = 30_000;
  * Average character-to-token ratio for Anthropic models.
  * Used for rough token count estimation from character counts.
  */
-export const AVG_CHARS_PER_TOKEN_ANTHROPIC = 2.5;
+export const AVG_CHARS_PER_TOKEN_ANTHROPIC = 3.5;

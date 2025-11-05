@@ -1,17 +1,22 @@
 import { ChatHubProvider } from '@n8n/api-types';
+import { WithTimestamps, DateTimeColumn, User, CredentialsEntity, WorkflowEntity } from '@n8n/db';
 import {
-	WithTimestampsAndStringId,
-	DateTimeColumn,
-	User,
-	CredentialsEntity,
-	WorkflowEntity,
-} from '@n8n/db';
-import { Column, Entity, ManyToOne, OneToMany, JoinColumn } from '@n8n/typeorm';
+	Column,
+	Entity,
+	ManyToOne,
+	OneToMany,
+	JoinColumn,
+	type Relation,
+	PrimaryGeneratedColumn,
+} from '@n8n/typeorm';
 
 import type { ChatHubMessage } from './chat-hub-message.entity';
 
 @Entity({ name: 'chat_hub_sessions' })
-export class ChatHubSession extends WithTimestampsAndStringId {
+export class ChatHubSession extends WithTimestamps {
+	@PrimaryGeneratedColumn('uuid')
+	id: string;
+
 	/**
 	 * The title of the chat session/conversation.
 	 * Auto-generated if not provided by the user after the initial AI responses.
@@ -22,7 +27,7 @@ export class ChatHubSession extends WithTimestampsAndStringId {
 	/**
 	 * ID of the user that owns this chat session.
 	 */
-	@Column({ type: 'varchar', length: 36 })
+	@Column({ type: String })
 	ownerId: string;
 
 	/**
@@ -30,7 +35,7 @@ export class ChatHubSession extends WithTimestampsAndStringId {
 	 */
 	@ManyToOne('User', { onDelete: 'CASCADE' })
 	@JoinColumn({ name: 'ownerId' })
-	owner?: User;
+	owner?: Relation<User>;
 
 	/*
 	 * Timestamp of the last active message in the session.
@@ -50,7 +55,7 @@ export class ChatHubSession extends WithTimestampsAndStringId {
 	 */
 	@ManyToOne('CredentialsEntity', { onDelete: 'SET NULL', nullable: true })
 	@JoinColumn({ name: 'credentialId' })
-	credential?: CredentialsEntity | null;
+	credential?: Relation<CredentialsEntity> | null;
 
 	/*
 	 * Enum value of the LLM provider to use, e.g. 'openai', 'anthropic', 'google', 'n8n' (if applicable).
@@ -75,11 +80,26 @@ export class ChatHubSession extends WithTimestampsAndStringId {
 	 */
 	@ManyToOne('WorkflowEntity', { onDelete: 'SET NULL', nullable: true })
 	@JoinColumn({ name: 'workflowId' })
-	workflow?: WorkflowEntity | null;
+	workflow?: Relation<WorkflowEntity> | null;
+
+	/*
+	 * ID of the custom agent to use (if applicable).
+	 * Only set when provider is 'custom-agent'.
+	 */
+	@Column({ type: 'varchar', length: 36, nullable: true })
+	agentId: string | null;
+
+	/*
+	 * Cached name of the custom agent to use (if applicable).
+	 * In case agent gets deleted
+	 * Only set when provider is 'custom-agent'.
+	 */
+	@Column({ type: 'varchar', length: 128, nullable: true })
+	agentName: string | null;
 
 	/**
 	 * All messages that belong to this chat session.
 	 */
 	@OneToMany('ChatHubMessage', 'session')
-	messages?: ChatHubMessage[];
+	messages?: Array<Relation<ChatHubMessage>>;
 }
