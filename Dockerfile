@@ -5,18 +5,11 @@ USER root
 # Create necessary directories
 RUN mkdir -p /home/node/.n8n/nodes
 RUN mkdir -p /opt/render/project/src/custom-extensions
-RUN mkdir -p /home/node/.cache/puppeteer
 RUN mkdir -p /home/node/.n8n/.n8n
 
-# For Puppeteer, install Chrome dependencies (using apk for Alpine Linux)
+# For dependencies, install necessary packages (using apk for Alpine Linux)
 RUN apk update && apk add --no-cache \
-    chromium \
-    nss \
-    freetype \
-    freetype-dev \
-    harfbuzz \
     ca-certificates \
-    ttf-freefont \
     netcat-openbsd \
     && rm -rf /var/cache/apk/*
 
@@ -42,18 +35,9 @@ WORKDIR /opt/render/project/src/custom-extensions/n8n-nodes-imap
 RUN npm init -y
 RUN npm install n8n-nodes-imap@2.5.0
 
-# Install n8n-nodes-puppeteer
-RUN mkdir -p /opt/render/project/src/custom-extensions/n8n-nodes-puppeteer
-WORKDIR /opt/render/project/src/custom-extensions/n8n-nodes-puppeteer
-RUN npm init -y
-RUN npm install n8n-nodes-puppeteer@1.4.1
-# Install Puppeteer browser
-RUN cd /opt/render/project/src/custom-extensions/n8n-nodes-puppeteer && \
-    npx puppeteer browsers install chrome
-
 # Create n8n.json configuration
 WORKDIR /home/node/.n8n
-RUN echo '{"nodes":{"include":["n8n-nodes-document-generator","n8n-nodes-chatwoot","n8n-nodes-imap","n8n-nodes-puppeteer"]}}' > n8n.json
+RUN echo '{"nodes":{"include":["n8n-nodes-document-generator","n8n-nodes-chatwoot","n8n-nodes-imap"]}}' > n8n.json
 
 # Create startup script to ensure port is properly exposed
 RUN echo '#!/bin/sh' > /usr/local/bin/start-n8n.sh && \
@@ -84,10 +68,6 @@ ENV N8N_CUSTOM_EXTENSIONS=/opt/render/project/src/custom-extensions
 ENV N8N_LOG_LEVEL=debug
 ENV PORT=5678
 ENV N8N_PORT=5678
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-# Puppeteer browser launch arguments for better performance in containerized environments
-ENV PUPPETEER_ARGS="--no-sandbox,--disable-setuid-sandbox,--disable-dev-shm-usage,--disable-accelerated-2d-canvas,--no-first-run,--no-zygote,--disable-gpu,--disable-extensions,--disable-audio-output"
 # Enforce proper file permissions for n8n settings
 ENV N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
 # Note: N8N_ENCRYPTION_KEY should be set in Render environment variables, not here
