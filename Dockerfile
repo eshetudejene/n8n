@@ -7,11 +7,7 @@ RUN mkdir -p /home/node/.n8n/nodes
 RUN mkdir -p /opt/render/project/src/custom-extensions
 RUN mkdir -p /home/node/.n8n/.n8n
 
-# For dependencies, install necessary packages (using apk for Alpine Linux)
-RUN apk update && apk add --no-cache \
-    ca-certificates \
-    netcat-openbsd \
-    && rm -rf /var/cache/apk/*
+# n8n base image is now Debian-based, no additional packages needed
 
 # Install community nodes during build - combined into single layer to reduce memory usage
 RUN mkdir -p /opt/render/project/src/custom-extensions/n8n-nodes-document-generator && \
