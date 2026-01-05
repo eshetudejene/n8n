@@ -33,10 +33,13 @@ ENV N8N_USER_FOLDER=/home/node/.n8n
 ENV N8N_LOG_LEVEL=warn
 ENV PORT=5678
 ENV N8N_PORT=5678
-# Memory optimization settings
-ENV EXECUTIONS_DATA_SAVE_ON_ERROR=none
-ENV EXECUTIONS_DATA_SAVE_ON_SUCCESS=none
+# Memory optimization: save executions but auto-prune old ones to prevent DB bloat
+ENV EXECUTIONS_DATA_SAVE_ON_ERROR=all
+ENV EXECUTIONS_DATA_SAVE_ON_SUCCESS=all
 ENV EXECUTIONS_DATA_PRUNE=true
 ENV EXECUTIONS_DATA_MAX_AGE=168
-ENV N8N_PAYLOAD_SIZE_MAX=16777216
+ENV EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS=true
+# Store binary data (files/images) on disk instead of RAM/DB
 ENV N8N_DEFAULT_BINARY_DATA_MODE=filesystem
+# Limit payload size to prevent large data from crashing the instance
+ENV N8N_PAYLOAD_SIZE_MAX=33554432
