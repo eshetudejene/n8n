@@ -4,12 +4,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { createEventBus } from '@n8n/utils/event-bus';
 import EnterpriseEdition from '@/app/components/EnterpriseEdition.ee.vue';
 import Modal from './Modal.vue';
-import {
-	EnterpriseEditionFeature,
-	MODAL_CONFIRM,
-	PLACEHOLDER_EMPTY_WORKFLOW_ID,
-	WORKFLOW_SHARE_MODAL_KEY,
-} from '@/app/constants';
+import { EnterpriseEditionFeature, MODAL_CONFIRM, WORKFLOW_SHARE_MODAL_KEY } from '@/app/constants';
 import { getResourcePermissions } from '@n8n/permissions';
 import { useMessage } from '@/app/composables/useMessage';
 import { useToast } from '@/app/composables/useToast';
@@ -17,6 +12,7 @@ import { useSettingsStore } from '@/app/stores/settings.store';
 import { useUIStore } from '@/app/stores/ui.store';
 import { useUsersStore } from '@/features/settings/users/users.store';
 import { useWorkflowsStore } from '@/app/stores/workflows.store';
+import { useWorkflowsListStore } from '@/app/stores/workflowsList.store';
 import { useWorkflowsEEStore } from '@/app/stores/workflows.ee.store';
 import type { ITelemetryTrackProperties } from 'n8n-workflow';
 import type { BaseTextKey } from '@n8n/i18n';
@@ -41,6 +37,7 @@ const props = defineProps<{
 const { data } = props;
 
 const workflowsStore = useWorkflowsStore();
+const workflowsListStore = useWorkflowsListStore();
 const settingsStore = useSettingsStore();
 const uiStore = useUIStore();
 const usersStore = useUsersStore();
@@ -57,9 +54,9 @@ const route = useRoute();
 const workflowSaving = useWorkflowSaving({ router });
 
 const workflow = ref(
-	data.id === PLACEHOLDER_EMPTY_WORKFLOW_ID
-		? workflowsStore.workflow
-		: workflowsStore.workflowsById[data.id],
+	data.id && workflowsListStore.workflowsById[data.id]
+		? workflowsListStore.workflowsById[data.id]
+		: workflowsStore.workflow,
 );
 const loading = ref(true);
 const isDirty = ref(false);
@@ -155,7 +152,7 @@ const onSave = async () => {
 	loading.value = true;
 
 	const saveWorkflowPromise = async () => {
-		if (workflow.value.id === PLACEHOLDER_EMPTY_WORKFLOW_ID) {
+		if (!workflowsStore.isWorkflowSaved[workflow.value.id]) {
 			const parentFolderId = route.query.folderId as string | undefined;
 			const workflowId = await workflowSaving.saveAsNewWorkflow({ parentFolderId });
 			if (!workflowId) {
@@ -214,8 +211,9 @@ const initialize = async () => {
 	if (isSharingEnabled.value) {
 		await Promise.all([usersStore.fetchUsers(), projectsStore.getAllProjects()]);
 
-		if (workflow.value.id !== PLACEHOLDER_EMPTY_WORKFLOW_ID) {
-			await workflowsStore.fetchWorkflow(workflow.value.id);
+		// Fetch workflow if it exists and is not new
+		if (workflowsStore.isWorkflowSaved[workflow.value.id]) {
+			await workflowsListStore.fetchWorkflow(workflow.value.id);
 		}
 
 		if (isHomeTeamProject.value && workflow.value.homeProject) {
@@ -281,6 +279,7 @@ watch(
 							:readonly="!workflowPermissions.share"
 							:static="isHomeTeamProject || !workflowPermissions.share"
 							:placeholder="i18n.baseText('workflows.shareModal.select.placeholder')"
+							:empty-options-text="i18n.baseText('workflows.shareModel.select.notFound')"
 							@project-added="onProjectAdded"
 							@project-removed="onProjectRemoved"
 						/>

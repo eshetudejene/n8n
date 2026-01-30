@@ -223,6 +223,7 @@ export class JobProcessor {
 						startedAt: now,
 						stoppedAt: now,
 						data: createRunExecutionData({ resultData: { error, runData: {} } }),
+						storedAt: execution.storedAt,
 					};
 
 					await lifecycleHooks.runHook('workflowExecuteAfter', [runData]);
@@ -287,8 +288,13 @@ export class JobProcessor {
 		const runningJob = this.runningJobs[jobId];
 		if (!runningJob) return;
 
-		const executionId = runningJob.executionId;
-		this.eventService.emit('execution-cancelled', { executionId });
+		const { executionId, workflowId, workflowName } = runningJob;
+		this.eventService.emit('execution-cancelled', {
+			executionId,
+			workflowId,
+			workflowName,
+			reason: 'manual', // Job stops via scaling service are always user-initiated
+		});
 
 		runningJob.run.cancel();
 		delete this.runningJobs[jobId];
